@@ -1,5 +1,5 @@
 import BaseRepository from './data/BaseRepository'
-import {getEventsConfig} from './config'
+import { getEventsConfig } from './config'
 
 export default async (database, eventMessage) => {
   const { EVENT_TYPES } = getEventsConfig
@@ -7,25 +7,43 @@ export default async (database, eventMessage) => {
   switch (eventMessage.event) {
     case EVENT_TYPES.PAGE_VISITED:
       try {
-        const dataBeforeResolver = await processEventBeforeResolver(database, eventMessage)
-        await pageVisitedResolver({...eventMessage, ...dataBeforeResolver})
+        const dataBeforeResolver = await processEventBeforeResolver(
+          database,
+          eventMessage
+        )
+        await pageVisitedResolver({ ...eventMessage, ...dataBeforeResolver })
         return
       } catch (error) {
         throw error
       }
-      
+
     case EVENT_TYPES.LINK_CLICKED:
       try {
-        const dataBeforeResolver = await processEventBeforeResolver(database, eventMessage)
-        await linkClickedResolver({...eventMessage, ...dataBeforeResolver})
-        return      
+        const dataBeforeResolver = await processEventBeforeResolver(
+          database,
+          eventMessage
+        )
+        await linkClickedResolver({ ...eventMessage, ...dataBeforeResolver })
+        return
       } catch (error) {
         throw error
       }
   }
 }
 
-const processEventBeforeResolver = async (database, { visitorIdentity, clientId, data }) => {
+const processEventBeforeResolver = async (
+  database,
+  { visitorIdentity = null, clientId = null, data }
+) => {
+  
+  if (!visitorIdentity) {
+    throw new Error('Visitor identity not supplied.')
+  }
+
+  if (!clientId) {
+    throw new Error('Site client id not supplied.')
+  }
+
   const conn = await database.getConnection()
   const repository = BaseRepository.getInstance().setConnection(conn)
 
@@ -99,7 +117,7 @@ const processEventBeforeResolver = async (database, { visitorIdentity, clientId,
     await conn.query('COMMIT')
     await conn.release()
 
-    return {visitorId, pageId, visitId, siteName: site.name}
+    return { visitorId, pageId, visitId, siteName: site.name }
   } catch (error) {
     if (conn != null) {
       await conn.query('ROLLBACK')
@@ -109,7 +127,7 @@ const processEventBeforeResolver = async (database, { visitorIdentity, clientId,
   }
 }
 
-const pageVisitedResolver = async ({ visitId, pageId, siteName, data }) => {  
+const pageVisitedResolver = async ({ visitId, pageId, siteName, data }) => {
   try {
     const repository = BaseRepository.getInstance()
     await repository.create(
@@ -124,10 +142,10 @@ const pageVisitedResolver = async ({ visitId, pageId, siteName, data }) => {
     }
 
     throw error
-  }   
-} 
+  }
+}
 
-const linkClickedResolver = async ({ visitorId, pageId, siteName, data }) => {  
+const linkClickedResolver = async ({ visitorId, pageId, siteName, data }) => {
   try {
     const repository = BaseRepository.getInstance()
     await repository.create(
@@ -142,8 +160,8 @@ const linkClickedResolver = async ({ visitorId, pageId, siteName, data }) => {
     }
 
     throw error
-  }   
-} 
+  }
+}
 
 const exceedsDurationTime = createdAt => {
   const currentDate = new Date()

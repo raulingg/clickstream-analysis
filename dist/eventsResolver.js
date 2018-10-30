@@ -45,10 +45,18 @@ var _default = async (database, eventMessage) => {
 exports.default = _default;
 
 const processEventBeforeResolver = async (database, {
-  visitorIdentity,
-  clientId,
+  visitorIdentity = null,
+  clientId = null,
   data
 }) => {
+  if (!visitorIdentity) {
+    throw new Error('Visitor identity not supplied.');
+  }
+
+  if (!clientId) {
+    throw new Error('Site client id not supplied.');
+  }
+
   const conn = await database.getConnection();
 
   const repository = _BaseRepository.default.getInstance().setConnection(conn);

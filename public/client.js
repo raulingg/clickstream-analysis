@@ -1,6 +1,11 @@
-;(function(siteClientId, io, window, document) {
+;(function(siteClientId, io, window) {
   var visitorId = undefined
   var cookieName = 'clickstream'
+  var EVENT_TYPES = {
+    PAGE_VISITED: 'pageVisited',
+    LINK_CLICKED: 'linkClicked'
+  }
+
   var socketOptions = {
     query: { token: siteClientId }
   }
@@ -8,18 +13,19 @@
   var socket = io('http://localhost:5000/', socketOptions)
 
   socket.on('connect', function() {
-    console.log('connected')
+    console.log('Connected to socket server')    
+  })
+
+  window.onload = function() {
+    console.log('send event: ' + EVENT_TYPES.PAGE_VISITED)
 
     if (!getUniqueVisitorId()) {
       visitorId = createUniqueVisitorId()
     }
-  })
 
-  window.onload = function() {
-    this.console.log('send event: pageVisited')
     socket.send({
-      visitorIdentity: getUniqueVisitorId(),
-      event: 'pageVisited',
+      visitorIdentity: visitorId,
+      event: EVENT_TYPES.PAGE_VISITED,
       data: {
         pathname: window.location.pathname,
         hostname: window.location.hostname,
@@ -45,9 +51,11 @@
       return
     }
 
+    console.log('send event: ' + EVENT_TYPES.LINK_CLICKED)
+
     socket.send({
       visitorIdentity: getUniqueVisitorId(),
-      event: 'linkClicked',
+      event: EVENT_TYPES.LINK_CLICKED,
       data: {
         referer: currentPathName,
         pathname: target.pathname,
@@ -108,4 +116,4 @@
 
     return null
   }
-})('123456789', io, window, document)
+})(siteClientId, io, window)

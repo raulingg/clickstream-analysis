@@ -18,7 +18,7 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 var _default = {
   init: (configs, database) => {
     const httpServer = (0, _http.createServer)();
-    const socketServer = (0, _socket.default)(httpServer); // authorization middleware
+    const socketServer = (0, _socket.default)(httpServer); // AUTHORIZATION MIDDLEWARE
 
     socketServer.use(async (socket, next) => {
       console.log('Run authorization middleware');
@@ -76,7 +76,6 @@ var _default = {
       });
       socket.on('disconnect', socket => {
         console.log('socket  disconnected');
-        socketServer.emit('pageview', {});
       });
     });
     return httpServer;
