@@ -8,7 +8,7 @@ export default {
     const httpServer = createServer()
     const socketServer = io(httpServer)
 
-    // authorization middleware
+    // AUTHORIZATION MIDDLEWARE
     socketServer.use(async (socket, next) => {
       console.log('Run authorization middleware')
       const {
@@ -52,7 +52,7 @@ export default {
         const { token: clientId } = socket.request._query
 
         try {
-          const result = await eventsResolver({ ...message, clientId }, database)
+          await eventsResolver(database, { ...message, clientId })
         } catch (error) {
           console.log(error)
           throw error
@@ -61,7 +61,6 @@ export default {
 
       socket.on('disconnect', socket => {
         console.log('socket  disconnected')
-        socketServer.emit('pageview', {})
       })
     })
 

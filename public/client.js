@@ -28,17 +28,34 @@
     })
   }
 
-  // window.document.onclick = function(event) {
-  //   //IE doesn't pass in the event object
-  //   event = event || window.event
+  window.document.onclick = function(event) {
+    //IE doesn't pass in the event object
+    event = event || window.event
 
-  //   //IE uses srcElement as the target
-  //   var target = event.target || event.srcElement
-  //   if (target.localName === 'a') {
-  //     console.log(target.href)
-  //     socket.send({ event: 'linkClicked', link: target.href })
-  //   }
-  // }
+    var currentPathName = window.location.pathname
+    //IE uses srcElement as the target
+    var target = event.target || event.srcElement
+
+    if (target.localName !== 'a') {
+      return
+    }
+
+    // it doesn't consider hash links
+    if (target.hash) {
+      return
+    }
+
+    socket.send({
+      visitorIdentity: getUniqueVisitorId(),
+      event: 'linkClicked',
+      data: {
+        referer: currentPathName,
+        pathname: target.pathname,
+        hostname: window.location.hostname,
+        url: window.location.href
+      }
+    })
+  }
 
   function createUniqueVisitorId(days = 365) {
     var expirationDate = new Date()
@@ -91,5 +108,4 @@
 
     return null
   }
-
 })('123456789', io, window, document)

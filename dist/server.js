@@ -66,9 +66,9 @@ var _default = {
         } = socket.request._query;
 
         try {
-          const result = await (0, _eventsResolver.default)({ ...message,
+          await (0, _eventsResolver.default)(database, { ...message,
             clientId
-          }, database);
+          });
         } catch (error) {
           console.log(error);
           throw error;
