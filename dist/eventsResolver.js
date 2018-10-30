@@ -7,6 +7,8 @@ exports.default = void 0;
 
 var _BaseRepository = _interopRequireDefault(require("./data/BaseRepository"));
 
+var _sqlstring = require("sqlstring");
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 const EVENTS = {
@@ -58,11 +60,16 @@ const pageVisitedResolver = async ({
       visitorId = await repository.create('visitors', ['identity', 'site_id'], [visitorIdentity, sites[0].id]);
     }
 
-    const [visits, columns] = await conn.query(`SELECT id FROM visits WHERE visitor_id = ? and ended_at is ?`, [visitorId, null]);
+    const [visits, columns] = await conn.query(`SELECT id, created_at FROM visits WHERE visitor_id = ? and ended_at is ?`, [visitorId, null]);
     let visitId = visits[0] ? visits[0].id : null;
 
     if (!visitId) {
       visitId = await repository.create('visits', ['visitor_id', 'site'], [visitorId, sites[0].name]);
+    } else if (exceedsDurationTime(visits[0].created_at)) {
+      const visitCreatePromise = repository.create('visits', ['visitor_id', 'site'], [visitorId, sites[0].name]);
+      const visitUpdatePromise = repository.update('visits', visits[0].id, ['ended_at'], [new Date()]);
+      visitId = await visitCreatePromise;
+      await visitUpdatePromise;
     }
 
     const pageViewId = await repository.create('pageviews', ['visit_id', 'page_id', 'page_url', 'site'], [visitId, pageId, data.pathname, sites[0].name]);
@@ -75,4 +82,11 @@ const pageVisitedResolver = async ({
 
     throw err;
   }
+};
+
+const exceedsDurationTime = createdAt => {
+  const currentDate = new Date();
+  const timeDiff = (currentDate - createdAt) / 1000; // is new visit if exceeds 1800s (30min)
+
+  return timeDiff > 1800;
 };

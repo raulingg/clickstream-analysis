@@ -1,4 +1,5 @@
 import BaseRepository from './data/BaseRepository'
+import { format as SqlStringFormat } from 'sqlstring'
 
 const EVENTS = {
   PAGE_VISITED: 'pageVisited',
@@ -57,9 +58,10 @@ const pageVisitedResolver = async ({ visitorIdentity, clientId, data }) => {
     }
 
     const [visits, columns] = await conn.query(
-      `SELECT id FROM visits WHERE visitor_id = ? and ended_at is ?`,
+      `SELECT id, created_at FROM visits WHERE visitor_id = ? and ended_at is ?`,
       [visitorId, null]
     )
+
     let visitId = visits[0] ? visits[0].id : null
 
     if (!visitId) {
@@ -68,6 +70,21 @@ const pageVisitedResolver = async ({ visitorIdentity, clientId, data }) => {
         ['visitor_id', 'site'],
         [visitorId, sites[0].name]
       )
+    } else if (exceedsDurationTime(visits[0].created_at)) {
+      const visitCreatePromise = repository.create(
+        'visits',
+        ['visitor_id', 'site'],
+        [visitorId, sites[0].name]
+      )
+      const visitUpdatePromise = repository.update(
+        'visits',
+        visits[0].id,
+        ['ended_at'],
+        [new Date()]
+      )
+
+      visitId = await visitCreatePromise
+      await visitUpdatePromise
     }
 
     const pageViewId = await repository.create(
@@ -85,4 +102,12 @@ const pageVisitedResolver = async ({ visitorIdentity, clientId, data }) => {
 
     throw err
   }
+}
+
+const exceedsDurationTime = createdAt => {
+  const currentDate = new Date()
+  const timeDiff = (currentDate - createdAt) / 1000
+
+  // is new visit if exceeds 1800s (30min)
+  return timeDiff > 1800
 }

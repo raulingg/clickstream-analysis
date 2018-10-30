@@ -6,6 +6,10 @@ var _path = _interopRequireDefault(require("path"));
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
+/**
+ * Note:  Express is used only with purpose of creating a client app, 
+ *        this doesn't use for building the server app
+ */
 const app = (0, _express.default)();
 
 const pathFile = _path.default.join(__dirname, '../public');

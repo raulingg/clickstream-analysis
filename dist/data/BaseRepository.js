@@ -39,6 +39,20 @@ class BaseRepository {
       }
     });
 
+    _defineProperty(this, "update", async (table, whereValue, fields, values) => {
+      const queryFields = fields.join('= ?, ');
+      const query = (0, _sqlstring.format)(`UPDATE ${table} SET ${queryFields} = ? where id = ?`, [...values, whereValue]);
+
+      try {
+        11;
+        const conn = this.getConnection();
+        const [result] = await conn.query(query);
+        return result.insertId;
+      } catch (error) {
+        throw error;
+      }
+    });
+
     _defineProperty(this, "findByField", async (table, field, value) => {
       const query = `SELECT * FROM ${table} WHERE ${field} = ?`;
 

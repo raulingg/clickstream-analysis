@@ -1,5 +1,6 @@
 ;(function(siteClientId, io, window, document) {
-  var visitorId = getUniqueVisitorId()
+  var visitorId = undefined
+  var cookieName = 'clickstream'
   var socketOptions = {
     query: { token: siteClientId }
   }
@@ -9,7 +10,7 @@
   socket.on('connect', function() {
     console.log('connected')
 
-    if (!visitorId) {
+    if (!getUniqueVisitorId()) {
       visitorId = createUniqueVisitorId()
     }
   })
@@ -17,9 +18,9 @@
   window.onload = function() {
     this.console.log('send event: pageVisited')
     socket.send({
-      visitorIdentity: visitorId,
+      visitorIdentity: getUniqueVisitorId(),
       event: 'pageVisited',
-      data: {        
+      data: {
         pathname: window.location.pathname,
         hostname: window.location.hostname,
         url: window.location.href
@@ -44,36 +45,51 @@
     expirationDate.setTime(
       expirationDate.getTime() + days * 60 * 60 * 24 * 1000
     )
-    var value =
+    var uniqueVisitorId =
       Math.floor(Math.random() * 9000000000) +
       1000000000 +
       '.' +
       expirationDate.getTime()
     var expires = 'expires=' + expirationDate.toGMTString()
-    window.document.cookie = 'analytics=' + value + '; ' + expires
+    window.document.cookie = cookieName + '=' + uniqueVisitorId + '; ' + expires
 
-    return value
+    return uniqueVisitorId
   }
 
   function getUniqueVisitorId() {
-    if (!visitorId) {
-      visitorId = retrieveUniqueVisitorIdFromCookie()
+    if (visitorId === undefined) {
+      visitorId = getCookieValue()
     }
 
     return visitorId
   }
 
-  function retrieveUniqueVisitorIdFromCookie() {
-    var name = 'analytics='
+  function resetCookie(days = 365) {
+    var cookie = getCookie()
+
+    if (cookie) {
+      var expirationDate = new Date()
+      expirationDate.setTime(
+        expirationDate.getTime() + days * 60 * 60 * 24 * 1000
+      )
+      var expires = 'expires=' + expirationDate.toGMTString()
+      window.document.cookie = cookieName + '=' + visitorId + '; ' + expires
+    }
+  }
+
+  function getCookieValue() {
+    var name = cookieName + '='
     var cookies = window.document.cookie.split(';')
 
     for (var i = 0, length = cookies.length; i < length; i++) {
       var cookie = cookies[i].trim()
 
-      if (cookie.indexOf(name) == 0)
+      if (cookie.indexOf(name) == 0) {
         return cookie.substring(name.length, cookie.length)
+      }
     }
 
     return null
   }
-})('7ih36n776lgq2vo3', io, window, document)
+
+})('123456789', io, window, document)
