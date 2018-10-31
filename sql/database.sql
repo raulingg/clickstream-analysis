@@ -25,7 +25,7 @@ DROP TABLE IF EXISTS `clicks`;
 CREATE TABLE `clicks` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `referer` varchar(255) DEFAULT NULL,
-  `created_at` datetime DEFAULT CURRENT_TIMESTAMP,
+  `created_at` timestamp DEFAULT CURRENT_TIMESTAMP,
   `visitor_id` int(11) DEFAULT NULL,
   `page_id` int(11) DEFAULT NULL,
   `page_url` varchar(255) DEFAULT NULL,
@@ -65,7 +65,7 @@ DROP TABLE IF EXISTS `pageviews`;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `pageviews` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
-  `created_at` datetime DEFAULT CURRENT_TIMESTAMP,
+  `created_at` timestamp DEFAULT CURRENT_TIMESTAMP,
   `visit_id` int(11) DEFAULT NULL,
   `page_id` int(11) DEFAULT NULL,
   `page_url` varchar(255) DEFAULT NULL,
@@ -91,8 +91,8 @@ CREATE TABLE `sites` (
   `domain` varchar(255) NOT NULL,
   `client_id` varchar(45) NOT NULL,
   `owner_id` int(11) DEFAULT NULL,
-  `created_at` datetime DEFAULT CURRENT_TIMESTAMP,
-  `updated_at` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `created_at` timestamp DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` timestamp,
   PRIMARY KEY (`id`),
   UNIQUE KEY `domain_UNIQUE` (`domain`),
   UNIQUE KEY `client_id_UNIQUE` (`client_id`),
@@ -115,8 +115,8 @@ CREATE TABLE `users` (
   `email` varchar(100) NOT NULL,
   `password` varchar(255) NOT NULL,
   `secret` varchar(255) NOT NULL,
-  `created_at` datetime DEFAULT CURRENT_TIMESTAMP,
-  `updated_at` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `created_at` timestamp DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` timestamp,
   PRIMARY KEY (`id`),
   UNIQUE KEY `email` (`email`)
 ) ENGINE=InnoDB8 DEFAULT CHARSET=utf8;
@@ -132,8 +132,8 @@ DROP TABLE IF EXISTS `visitors`;
 CREATE TABLE `visitors` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `identity` varchar(255) NOT NULL,
-  `created_at` datetime DEFAULT CURRENT_TIMESTAMP,
-  `updated_at` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `created_at` timestamp DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` timestamp,
   `site_id` int(11) NOT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `identity_UNIQUE` (`identity`),
@@ -151,7 +151,7 @@ DROP TABLE IF EXISTS `visits`;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `visits` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
-  `created_at` datetime DEFAULT CURRENT_TIMESTAMP,
+  `created_at` timestamp DEFAULT CURRENT_TIMESTAMP,
   `ended_at` datetime DEFAULT NULL,
   `visitor_id` int(11) NOT NULL,
   `site` varchar(255) DEFAULT NULL,
