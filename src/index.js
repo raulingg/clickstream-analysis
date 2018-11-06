@@ -1,6 +1,6 @@
 import { getDatabaseConfig, getServerConfig } from './config'
 import database from './database'
-import server from './server'
+import SocketServer from './socketServer'
 
 // Catch unhandling unexpected exceptions
 process.on('uncaughtException', error => {
@@ -16,8 +16,8 @@ const dbConfig = getDatabaseConfig()
 const db = database.init(dbConfig)
 
 const serverConfig = getServerConfig()
-const appServer = server.init(serverConfig, db)
+const socketServer = SocketServer.init(serverConfig, db)
 
-appServer.listen(serverConfig.port, () => {
-  console.log(`Server running at http://localhost:${serverConfig.port}`)
+socketServer.listen(serverConfig.socketPort, () => {
+  console.log(`Socket server running at http://localhost:${serverConfig.socketPort}`)
 })
