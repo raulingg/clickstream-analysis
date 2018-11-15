@@ -18,26 +18,27 @@ export default async (req, res, routes, database) => {
     return pathMatch && methodMatch
   })
 
+  if (!route) {
+    return errorResponse(res, 'Endpoint not found', 404)
+  }
+
   // Extract the "id" parameter from route and pass it to controller
   let param = null
 
-  if (route && typeof route.path === 'object') {
+  if (typeof route.path === 'object') {
     param = req.url.match(route.path)[1]
   }
 
   // Extract request inputs
-  if (route) {
-    let inputs = null
-    if (req.method === 'POST' || req.method === 'PUT') {
-      inputs = await getPostData(req)
-    } else {
-      inputs = parse(req.url, true).query
-    }
+  let inputs = null
 
-    return await route.handler(database, { req, res, param, inputs })
+  if (req.method === 'POST' || req.method === 'PUT') {
+    inputs = await getPostData(req)
   } else {
-    return errorResponse(res, 'Endpoint not found', 404)
+    inputs = parse(req.url, true).query
   }
+
+  return await route.handler(database, { req, res, param, inputs })
 }
 
 /**

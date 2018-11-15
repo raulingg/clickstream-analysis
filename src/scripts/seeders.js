@@ -1,11 +1,10 @@
 import db from '../database'
 import { getDatabaseConfig } from '../config'
-import bcrypt from 'bcrypt'
-import {
-  name as FakerName,
-  internet as FakerInternet,
-  random as FakerRandom
-} from 'faker'
+import bcrypt from 'bcrypt/bcrypt'
+import FakerName from 'faker/lib/name'
+import FakerInternet from 'faker/lib/internet'
+import FakerRandom from 'faker/lib/random'
+
 
 const dbConfig = getDatabaseConfig()
 const database = db.init(dbConfig)

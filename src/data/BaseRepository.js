@@ -72,7 +72,6 @@ class BaseRepository {
       [...values, whereValue]
     )
     try {
-      11
       const conn = this.getConnection()
       const [result] = await conn.query(query)
 

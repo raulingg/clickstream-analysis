@@ -1,10 +1,6 @@
-import {
-  errorResponse,
-  successResponse,
-  validationErrorResponse
-} from '../../helpers'
-
+import { JsonResponse } from '../../helpers'
 class PagesController {
+
   constructor(manager) {
     this.manager = manager
   }
@@ -13,7 +9,17 @@ class PagesController {
     const { dateInterval } = inputs
 
     if (!dateInterval) {
-      return validationErrorResponse(res, 'dateInterval not supplied')
+      const errorMessages = {
+        dateInterval : ['dateInterval is required']
+      }
+      return JsonResponse.validationError(res, errorMessages)
+    }
+
+    if (isNaN(dateInterval)) {
+      const errorMessages = {
+        dateInterval : ['dateInterval should be a number']
+      }
+      return JsonResponse.validationError(res, errorMessages)
     }
 
     try {
@@ -21,9 +27,9 @@ class PagesController {
         siteId,
         dateInterval
       )
-      return successResponse(res, rows)
+      return JsonResponse.success(res, rows)
     } catch (error) {
-      return errorResponse(res, error)
+      return JsonResponse.error(res, error)
     }
   }
 }

@@ -3,8 +3,7 @@ const getDatabaseConfig = () => ({
   user: process.env.DB_USER || 'root',
   password: process.env.DB_PASSWORD || '',
   connectionLimit: process.env.DB_CONNECTION_LIMIT || 10,
-  database: process.env.DB_DATABASE || 'analytics',
-  debug: process.env.DB_DEBUG || false,
+  database: process.env.DB_DATABASE || 'clickstream',
   waitForConnections: true,
   queueLimit: 0
 })

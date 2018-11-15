@@ -1,11 +1,11 @@
-import { createServer } from 'http'
+import http from 'http'
 import io from 'socket.io'
 import BaseRepository from './data/BaseRepository'
 import eventsResolver from './eventsResolver'
 
 export default {
   init: (configs, database) => {
-    const httpServer = createServer()
+    const httpServer = http.createServer()
     const socketServer = io(httpServer)
 
     // AUTHORIZATION MIDDLEWARE

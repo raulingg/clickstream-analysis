@@ -18,7 +18,7 @@ class PagesManager {
 
     let conn = await this.database.getConnection()
     let res = await conn.execute(query, [siteId, dateInterval])
-    conn.release()
+    await conn.release()
     return res
   }
 
